@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9;
+    }
+    .container {
+      min-width: 300px;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    
+    .select-group {
+      margin: 10px 0;
+    }
+    
+    select {
+      width: 100%;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    
+    .button-group {
+      margin-top: 15px;
+    }
+    
+    button {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      cursor: pointer;
+    }
+    
+    .footer {
+      margin-top: 15px;
+      font-size: 0.8em;
+      text-align: center;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Chicken Tránlate</h2>
+      <h4>Bôi đen văn bản và nhấn Ctrl để dịch</h4>
+    </div>
+    
+    <div class="select-group">
+      <label>Ngôn ngữ đầu vào</label>
+      <select id="language-in"></select>
+    </div>
+    
+    <div class="select-group">
+      <label>Ngôn ngữ đầu ra</label>
+      <select id="language-out"></select>
+    </div>
+    
+    <div class="button-group">
+      <button id="submit-chicken-trans" style="background: #4CAF50; color: white;">Lưu</button>
+      <button id="close-popup" style="background: #f44336; color: white;">Đóng</button>
+    </div>
+    
+    <div class="footer">
+      <p>Created by Huỳnh Quốc Bảo<br>
+      Góp ý: esdridz@gmail.com</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
