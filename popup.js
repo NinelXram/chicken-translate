@@ -1,4 +1,3 @@
-// Load ngôn ngữ
 const tl = [
   { code: "vi", name: "Vietnamese" },
   { code: "en", name: "English" },
@@ -41,19 +40,16 @@ const tl = [
   { code: "lo", name: "Lao" },
 ];
   
-  // Khởi tạo popup
   document.addEventListener('DOMContentLoaded', async () => {
     const langInSelect = document.getElementById('language-in');
     const langOutSelect = document.getElementById('language-out');
     
-    // Điền options
     const uniqueLangs = [...new Set(tl.map(JSON.stringify))].map(JSON.parse);
     uniqueLangs.forEach(lang => {
       langInSelect.innerHTML += `<option value="${lang.code}">${lang.name}</option>`;
       langOutSelect.innerHTML += `<option value="${lang.code}">${lang.name}</option>`;
     });
   
-    // Load settings
     const [languageIn, languageOut] = await Promise.all([
       getFromStorage('languageIn', 'vi'),
       getFromStorage('languageOut', 'en')
@@ -62,7 +58,6 @@ const tl = [
     langInSelect.value = languageIn;
     langOutSelect.value = languageOut;
   
-    // Xử lý sự kiện
     document.getElementById('submit-chicken-trans').addEventListener('click', () => {
       chrome.storage.sync.set({
         languageIn: langInSelect.value,
@@ -73,7 +68,6 @@ const tl = [
     document.getElementById('close-popup').addEventListener('click', () => window.close());
   });
   
-  // Helper functions
   const getFromStorage = (key, defaultValue) => 
     new Promise(resolve => 
       chrome.storage.sync.get([key], result => 
