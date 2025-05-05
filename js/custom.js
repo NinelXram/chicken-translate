@@ -1,5 +1,6 @@
 let translationPopup = null;
 let selectionIcon = null;
+let savedRange = null;
 
 function debounce(func, timeout = 300) {
   let timer;
@@ -10,8 +11,10 @@ function debounce(func, timeout = 300) {
 }
 
 const handleStableSelection = debounce(() => {
+  if (translationPopup) return
   const selection = window.getSelection();
   if (!selection.isCollapsed) {
+    savedRange = selection.getRangeAt(0);
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
     
@@ -32,27 +35,9 @@ document.addEventListener('keydown', (e) => {
 function createSelectionIcon(x, y) {
   if (selectionIcon) selectionIcon.remove();
 
-  const selection = window.getSelection();
-  const range = selection.getRangeAt(0);
-  const rects = range.getClientRects();
-  const lastRect = rects[rects.length - 1];
-  const iconX = lastRect.right + window.scrollX;
-  const iconY = lastRect.bottom + window.scrollY;
-  
-  selectionIcon = document.createElement('div');
-  selectionIcon.innerHTML = '🌐';
-  Object.assign(selectionIcon.style, {
-    position: 'absolute',
-    left: `${iconX + 5}px`,
-    top: `${iconY + 5}px`,
-    cursor: 'pointer',
-    background: 'white',
-    borderRadius: '50%',
-    padding: '2px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-    zIndex: 999999
-  });
+  setChickenIcon();
 
+  // Xóa phần tạo img element không cần thiết
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   const iconSize = 25;
@@ -64,50 +49,83 @@ function createSelectionIcon(x, y) {
     selectionIcon.style.top = `${viewportHeight - iconSize - 5}px`;
   }
 
+  // Giữ nguyên phần xử lý sự kiện click
   if (isSelectionInInput()) {
-    selectionIcon.addEventListener('click', handleInputFieldIconClick);
-  }
-  else {
+    selectionIcon.addEventListener('click', (e) => {
+      if (savedRange) {
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(savedRange.cloneRange());
+      }
+      handleInputFieldIconClick(e);
+    });
+  } else {
     selectionIcon.addEventListener('click', handleIconClick);
   }
+  
   document.body.appendChild(selectionIcon);
+}
+
+const setChickenIcon = () => {
+  const selection = window.getSelection();
+  const range = selection.getRangeAt(0);
+  const rects = range.getClientRects();
+  const lastRect = rects[rects.length - 1];
+  const iconX = lastRect.right + window.scrollX;
+  const iconY = lastRect.bottom + window.scrollY;
+  selectionIcon = document.createElement('div');
+  Object.assign(selectionIcon.style, {
+    position: 'absolute',
+    left: `${iconX + 5}px`,
+    top: `${iconY + 5}px`,
+    cursor: 'pointer',
+    background: `url(${chrome.runtime.getURL('icon.png')}) center/contain no-repeat`,
+    backgroundColor: 'white',
+    borderRadius: '50%',
+    width: '25px',
+    height: '25px',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+    zIndex: 999999,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  });
 }
 
 async function handleIconClick(e) {
   e.stopPropagation();
   const selection = window.getSelection().toString();
   if (!selection) return;
-
-  selectionIcon.innerHTML = '⏳';
   
   try {
     const translatedText = await translateText(selection);
     showTranslationPopup(translatedText, selection);
   } catch (error) {
     console.error(error);
-  } finally {
-    selectionIcon.innerHTML = '🌐';
   }
 }
 
 async function handleInputFieldIconClick(e) {
   e.stopPropagation();
-  const selection = window.getSelection().toString();
-  if (!selection) return;
-
-  selectionIcon.innerHTML = '⏳';
+  const selection = window.getSelection();
+  if (selection.rangeCount === 0 && savedRange) {
+    selection.removeAllRanges();
+    selection.addRange(savedRange);
+  }
+  
+  const selectedText = selection.toString();
+  if (!selectedText) return;
   
   try {
-    const translatedText = await translateText(selection);
-    showTranslationPopup(translatedText, selection, true);
+    const translatedText = await translateText(selectedText, true);
+    showTranslationPopup(translatedText, selectedText, true);
   } catch (error) {
     console.error(error);
-  } finally {
-    selectionIcon.innerHTML = '🌐';
   }
 }
 
 function showTranslationPopup(translatedText, originalText, isInputField = false) {
+
   if (translationPopup) translationPopup.remove();
 
   translationPopup = document.createElement('div');
@@ -126,7 +144,7 @@ function showTranslationPopup(translatedText, originalText, isInputField = false
     <div style="position: absolute; background: white; padding: 10px; 
          box-shadow: 0 2px 10px rgba(0,0,0,0.2); border-radius: 4px; z-index: 999999;
          display: flex; align-items: center; max-width: 400px;">
-      <div style="flex-grow: 1; margin-right: 10px; word-break: break-word;">${translatedText}</div>
+      <div style="flex-grow: 1; margin-right: 10px; word-break: break-word; color: black">${translatedText}</div>
       ${replaceButton}
     </div>`;
 
@@ -144,11 +162,31 @@ function showTranslationPopup(translatedText, originalText, isInputField = false
 }
 
 function replaceSelectedText(original, translated) {
-  const selection = window.getSelection();
-  if (selection.rangeCount > 0) {
-    const range = selection.getRangeAt(0);
-    range.deleteContents();
-    range.insertNode(document.createTextNode(translated));
+  if (savedRange) {
+    try {
+      const range = savedRange.cloneRange();
+      range.deleteContents();
+      const newNode = document.createTextNode(translated);
+      range.insertNode(newNode);
+      
+      const newRange = document.createRange();
+      newRange.selectNodeContents(newNode);
+      newRange.collapse(false);
+      
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(newRange);
+
+      savedRange = newRange;
+
+    } catch (error) {
+      console.error('Error replacing text:', error);
+      if (savedRange) {
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(savedRange);
+      }
+    }
   }
 }
 
@@ -193,15 +231,16 @@ const getFromStorage = (key, defaultValue) =>
     )
   );
 
-async function translateText(input) {
+async function translateText(input, isInputField = false) {
   const [sourceLang, targetLang] = await Promise.all([
     getFromStorage('languageIn', 'vi'),
     getFromStorage('languageOut', 'en')
   ]);
+  
 
   try {
     const response = await fetch(
-      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(input)}`
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${isInputField ? sourceLang : targetLang}&tl=${isInputField ? targetLang : sourceLang}&dt=t&q=${encodeURIComponent(input)}`
     );
     const data = await response.json();
     return data[0].map(item => item[0]).join('');
