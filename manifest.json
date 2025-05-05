@@ -1,7 +1,7 @@
 {
   "name": "Chicken Tránlate",
   "version": "2.0",
-  "description": "Dịch văn bản đã nhập với giao diện mới",
+  "description": "Highlight text to translate instantly. For quick translations on the fly.",
   "manifest_version": 2,
   "icons": {
     "16": "icon.png",

@@ -1,81 +1,104 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <title>Chicken Translate</title>
   <style>
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
-      unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9;
-    }
-    .container {
+      margin: 0;
+      padding: 0;
       min-width: 300px;
-      padding: 15px;
-      font-family: Arial, sans-serif;
     }
-    
+
+    .container {
+      padding: 15px;
+    }
+
     .header {
       text-align: center;
       margin-bottom: 15px;
     }
-    
+
+    .app-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 10px;
+    }
+
     .select-group {
-      margin: 10px 0;
+      margin: 15px 0;
     }
-    
+
     select {
-      width: 100%;
-      padding: 5px;
-      margin: 5px 0;
-    }
-    
-    .button-group {
-      margin-top: 15px;
-    }
-    
-    button {
       width: 100%;
       padding: 8px;
       margin: 5px 0;
-      cursor: pointer;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
     }
-    
+
+    .button-group {
+      margin-top: 20px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
     .footer {
-      margin-top: 15px;
+      margin-top: 20px;
       font-size: 0.8em;
       text-align: center;
       color: #666;
+      line-height: 1.4;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
-        <img src="icon.png" alt="Icon" style="width: 50px; height: 50px;">
+      <img src="icon.png" class="app-icon" alt="Chicken Translate Icon">
       <h2>Chicken Tránlate</h2>
-      <h4>Highlight text and click icon 🌐 to translate</h4>
+      <h4>Highlight text and click the translate icon</h4>
     </div>
-    
+
     <div class="select-group">
-        <label>Source Language</label>
-        
+      <label>Source Language</label>
       <select id="language-in"></select>
     </div>
-    
+
     <div class="select-group">
-        <label>Target Language</label>
+      <label>Target Language</label>
       <select id="language-out"></select>
     </div>
-    
+
     <div class="button-group">
-      <button id="submit-chicken-trans" style="background: #4CAF50; color: white;">Save</button>
+      <button id="submit-chicken-trans" style="background: #4CAF50; color: white;">Save Settings</button>
       <button id="close-popup" style="background: #f44336; color: white;">Close</button>
     </div>
-    
+
     <div class="footer">
-        <p>Created by Huỳnh Quốc Bảo<br>Feedback: esdridz@gmail.com</p>
+      <p>Developed by Huỳnh Quốc Bảo<br>
+        Contact: <a href="mailto:esdridz@gmail.com">esdridz@gmail.com</a></p>
     </div>
   </div>
 
   <script src="popup.js"></script>
 </body>
+
 </html>
